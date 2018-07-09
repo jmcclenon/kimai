@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) Kimai-Development-Team
  *
  * Kimai is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ abstract class Kimai_Invoice_AbstractRenderer
      *
      * @return mixed
      */
-    public abstract function render();
+    abstract public function render();
 
     /**
      * @param string $templateDir
@@ -121,25 +121,26 @@ abstract class Kimai_Invoice_AbstractRenderer
     {
         return false;
     }
-    
+
     protected function prepareCustomerArray($customer)
     {
-        $new = array(
-            'customerContact' => $customer['contact'],
-            'companyName' => $customer['company'],
-            'customerStreet' => $customer['street'],
-            'customerCity' => $customer['city'],
-            'customerZip' => $customer['zipcode'],
-            'customerPhone' => $customer['phone'],
-            'customerEmail' => $customer['mail'],
-            'customerComment' => $customer['comment'],
-            'customerFax' => $customer['fax'],
-            'customerMobile' => $customer['mobile'],
-            'customerURL' => $customer['homepage'],
-            'customerVat' => $customer['vat']
-        );
+        $kga = Kimai_Registry::getConfig();
+        $new = [
+            'customerContact' => isset($customer['contact']) ? $customer['contact'] : '',
+            'companyName' => isset($customer['company']) ? $customer['company'] : '',
+            'customerStreet' => isset($customer['street']) ? $customer['street'] : '',
+            'customerZip' => isset($customer['zipcode']) ? $customer['zipcode'] : '',
+            'customerCity' => isset($customer['city']) ? $customer['city'] : '',
+            'customerCountry' => ($customer['country'] !== '') ? Zend_Locale::getTranslation($customer['country'], 'country', $kga['language']) : '',
+            'customerPhone' => isset($customer['phone']) ? $customer['phone'] : '',
+            'customerEmail' => isset($customer['mail']) ? $customer['mail'] : '',
+            'customerComment' => isset($customer['comment']) ? $customer['comment'] : '',
+            'customerFax' => isset($customer['fax']) ? $customer['fax'] : '',
+            'customerMobile' => isset($customer['mobile']) ? $customer['mobile'] : '',
+            'customerURL' => isset($customer['homepage']) ? $customer['homepage'] : '',
+            'customerVat' => isset($customer['vat']) ? $customer['vat'] : '',
+        ];
 
         return $new;
     }
-
 }

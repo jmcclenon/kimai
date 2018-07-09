@@ -1,11 +1,19 @@
 /.project
 *.*~
-vendor/
-temporary/*.txt
-autoconf.php
 .settings
 .idea/
 .DS_Store
-libraries/bin/
-libraries/phpunit/
-libraries/symfony/
+
+/temporary/*
+!/temporary/.htaccess
+
+# the kimai config file
+/includes/autoconf.php
+
+/libraries/*
+# libraries that will be autoloaded but cannot be fetched from external repositories
+!/libraries/Kimai/
+!/libraries/jQuery/
+!/libraries/phpclasses/
+!/libraries/phpjs/
+!/libraries/TinyButStrongPlugins/

@@ -1,6 +1,6 @@
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) 2006-2009 Kimai-Development-Team
  *
  * Kimai is free software; you can redistribute it and/or modify
@@ -176,30 +176,33 @@ function export_extension_set_heightTop() {
  */
 function export_extension_set_TableWidths() {
 	export_extension_get_dimensions();
-	// set table widths   
+	// set table widths
 
 	($("#xp").innerHeight() - $("#xp table").outerHeight() > 0) ? scr = 0 : scr = scroller_width; // width of export table depending on scrollbar or not
 	$("#xp table").css("width", export_width - scr);
 
 	$("#export_head > table").css("width", "100%");
 
-
-	$("#export_head > table > tbody > tr > td.time").css("width", $("div#xp > div > table > tbody > tr > td.time").width());
-	$("#export_head > table > tbody > tr > td.wage").css("width", $("div#xp > div > table > tbody > tr > td.wage").width());
-	$("#export_head > table > tbody > tr > td.rate").css("width", $("div#xp > div > table > tbody > tr > td.rate").width());
-	$("#export_head > table > tbody > tr > td.billable").css("width", $("div#xp > div > table > tbody > tr > td.billable").width());
-	$("#export_head > table > tbody > tr > td.status").css("width", $("div#xp > div > table > tbody > tr > td.status").width());
-	$("#export_head > table > tbody > tr > td.budget").css("width", $("div#xp > div > table > tbody > tr > td.budget").width());
-	$("#export_head > table > tbody > tr > td.approved").css("width", $("div#xp > div > table > tbody > tr > td.approved").width());
-	$("#export_head > table > tbody > tr > td.customer").css("width", $("div#xp > div > table > tbody > tr > td.customer").width());
-	$("#export_head > table > tbody > tr > td.project").css("width", $("div#xp > div > table > tbody > tr > td.project").width());
-	$("#export_head > table > tbody > tr > td.activity").css("width", $("div#xp > div > table > tbody > tr > td.activity").width());
-	$("#export_head > table > tbody > tr > td.description").css("width", $("div#xp > div > table > tbody > tr > td.description").width());
-	$("#export_head > table > tbody > tr > td.moreinfo").css("width",
-		$("div#xp > div > table > tbody > tr > td.comment").width() +
-		$("div#xp > div > table > tbody > tr > td.location").width() +
-		$("div#xp > div > table > tbody > tr > td.trackingNumber").width()
-	);
+	$("#export_head > table > tbody > tr > td.date").css("width", 		$("div#xp > div > table > tbody > tr > td.date").width());
+	$("#export_head > table > tbody > tr > td.from").css("width", 		$("div#xp > div > table > tbody > tr > td.from").width());
+	$("#export_head > table > tbody > tr > td.to").css("width", 		$("div#xp > div > table > tbody > tr > td.to").width());
+	$("#export_head > table > tbody > tr > td.time").css("width", 		$("div#xp > div > table > tbody > tr > td.time").width());
+	$("#export_head > table > tbody > tr > td.dec_time").css("width", 	$("div#xp > div > table > tbody > tr > td.dec_time").width());
+	$("#export_head > table > tbody > tr > td.rate").css("width", 		$("div#xp > div > table > tbody > tr > td.rate").width());
+	$("#export_head > table > tbody > tr > td.wage").css("width", 		$("div#xp > div > table > tbody > tr > td.wage").width());
+	$("#export_head > table > tbody > tr > td.budget").css("width", 	$("div#xp > div > table > tbody > tr > td.budget").width());
+	$("#export_head > table > tbody > tr > td.approved").css("width", 	$("div#xp > div > table > tbody > tr > td.approved").width());
+	$("#export_head > table > tbody > tr > td.status").css("width", 	$("div#xp > div > table > tbody > tr > td.status").width());
+	$("#export_head > table > tbody > tr > td.billable").css("width",	$("div#xp > div > table > tbody > tr > td.billable").width());
+	$("#export_head > table > tbody > tr > td.customer").css("width", 	$("div#xp > div > table > tbody > tr > td.customer").width());
+	$("#export_head > table > tbody > tr > td.project").css("width", 	$("div#xp > div > table > tbody > tr > td.project").width());
+	$("#export_head > table > tbody > tr > td.activity").css("width", 	$("div#xp > div > table > tbody > tr > td.activity").width());
+	$("#export_head > table > tbody > tr > td.description").css("width",$("div#xp > div > table > tbody > tr > td.description").width());
+	$("#export_head > table > tbody > tr > td.comment").css("width", 	$("div#xp > div > table > tbody > tr > td.comment").width());
+	$("#export_head > table > tbody > tr > td.location").css("width", 	$("div#xp > div > table > tbody > tr > td.location").width());
+	$("#export_head > table > tbody > tr > td.trackingNumber").css("width", $("div#xp > div > table > tbody > tr > td.trackingNumber").width());
+	$("#export_head > table > tbody > tr > td.user").css("width", 		$("div#xp > div > table > tbody > tr > td.user").width());
+	$("#export_head > table > tbody > tr > td.cleared").css("width", 	$("div#xp > div > table > tbody > tr > td.cleared").width() + scr);
 }
 
 function export_extension_tab_changed() {
@@ -268,7 +271,7 @@ function export_extension_activities_changed() {
 // reloads timesheet, customer, project and activity tables
 //
 function export_extension_reload() {
-	// don't reload if extension is not loaded  
+	// don't reload if extension is not loaded
 	if ($('.ki_export').html() == '') {
 		return;
 	}
@@ -323,6 +326,25 @@ function export_toggle_column(name) {
 			returnfunction
 		);
 	}
+}
+
+/**
+ * Check if any checked entrys are in the list and confirm toggle if there are any.
+ */
+function export_toogle_cleared_confirm() {
+	var checked_elements = 0;
+	$('#xptable td.cleared>a').each(function() {
+		if ($(this).hasClass("is_cleared")) {
+			checked_elements++;
+		}
+	});
+	if (checked_elements > 0) {
+		// TODO: add translations somehow
+		if (!confirm('There are already ' + checked_elements + ' cleared entries!\nDo you really want to set these entries to uncleared?')) {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**

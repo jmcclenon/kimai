@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) 2006-2009 Kimai-Development-Team
  *
  * Kimai is free software; you can redistribute it and/or modify
@@ -21,15 +21,19 @@
  * Handle all AJAX calls from the installer.
  */
 
-defined('WEBROOT') || define('WEBROOT', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
+defined('WEBROOT') || define('WEBROOT', dirname(dirname(__FILE__)));
 defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../'));
 
 require_once WEBROOT . '/libraries/autoload.php';
 
 // from php documentation at http://www.php.net/manual/de/function.ini-get.php
-function return_bytes($val) {
+function return_bytes($val)
+{
     $val = trim($val);
     $last = strtolower($val[strlen($val) - 1]);
+    if ($last) {
+        $val = substr($val, 0, strlen($val) - 1);
+    }
     switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0
         case 'g':
@@ -44,7 +48,8 @@ function return_bytes($val) {
 }
 
 // stolen somewhere ... please forgive me - i don't know who wrote this .... O-o
-function getpass() {
+function getpass()
+{
     $newpass = "";
     $laenge = 10;
     $string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -60,39 +65,46 @@ function getpass() {
 
 $axAction = strip_tags($_REQUEST['axAction']);
 
-$javascript = "";
+$javascript = '';
 $errors = 0;
 
 switch ($axAction) {
 
-
     /**
      * Check for the requirements of Kimai:
-     *  - PHP major version >= 5.4
+     *  - PHP major version >= 5.5
      *  - MySQLi extension available
      *  - iconv extension available
      *  - memory limit should be at least 20 MB for reliable PDF export
      */
-    case "checkRequirements":
-       if (version_compare(PHP_VERSION, '5.4') < 0) {
-           $errors++;
-           $javascript .= "$('div.sp_phpversion').addClass('fail');";
-       }
+    case 'checkRequirements':
+        if (version_compare(PHP_VERSION, '5.5') < 0) {
+            $errors++;
+            $javascript .= "$('div.sp_phpversion').addClass('fail');";
+        }
 
-       if (!extension_loaded('mysqli')) {
-           $errors++;
-           $javascript .= "$('div.sp_mysql').addClass('fail');";
-       }
+        if (!extension_loaded('mysqli')) {
+            $errors++;
+            $javascript .= "$('div.sp_mysql').addClass('fail');";
+        }
 
         if (!extension_loaded('iconv')) {
             $errors++;
             $javascript .= "$('div.sp_iconv').addClass('fail');";
         }
 
-       if (return_bytes(ini_get('memory_limit')) < 20000000) {
-           $javascript .= "$('div.sp_memory').addClass('fail');";
-       }
+        if (!class_exists('DOMDocument') || !extension_loaded('dom')) {
+            $errors++;
+            $javascript .= "$('div.sp_dom').addClass('fail');";
+        }
+        if (!class_exists('ZipArchive') || !extension_loaded('zip')) {
+            $errors++;
+            $javascript .= "$('div.sp_zip').addClass('fail');";
+        }
 
+        if (return_bytes(ini_get('memory_limit')) < 20000000) {
+            $javascript .= "$('div.sp_memory').addClass('fail');";
+        }
 
         if (empty($javascript)) {
             $javascript = "$('#installsteps button.sp-button').hide();";
@@ -105,12 +117,12 @@ switch ($axAction) {
         $javascript .= "resetRequirementsIndicators();" . $javascript;
         echo $javascript;
 
-      break;
+        break;
 
     /**
      * Check access rights to autoconf.php, the logfile and the temporary folder.
      */
-    case "checkRights":
+    case 'checkRights':
         if ((file_exists("../includes/autoconf.php") && !is_writeable("../includes/autoconf.php")) || !is_writeable("../includes/")) {
             $errors++;
             $javascript .= "$('span.ch_autoconf').addClass('fail');";
@@ -133,52 +145,64 @@ switch ($axAction) {
         }
 
         echo $javascript;
-    break;
+        break;
 
     /**
      * Create the autoconf.php file.
      */
-    case ("write_config"):
-        include "../includes/func.php";
-         // special characters " and $ are escaped
-        $database    = $_REQUEST['database'];
-        $hostname    = $_REQUEST['hostname'];
-        $username    = $_REQUEST['username'];
-        $password    = $_REQUEST['password'];
-        $timezone    = $_REQUEST['timezone'];
-        $prefix      = addcslashes($_REQUEST['prefix'], '"$');
-        $lang        = $_REQUEST['lang'];
-        $salt        = createPassword(20);
+    case 'write_config':
+        include '../includes/func.php';
+        // special characters " and $ are escaped
+        $database = $_REQUEST['database'];
+        $hostname = $_REQUEST['hostname'];
+        $username = $_REQUEST['username'];
+        $password = $_REQUEST['password'];
+        $charset = 'utf8';
+        $prefix = addcslashes($_REQUEST['prefix'], '"$');
+        $lang = $_REQUEST['lang'];
+        $salt = createPassword(20);
+        $timezone = $_REQUEST['timezone'];
 
-        write_config_file($database, $hostname, $username, $password, $prefix, $lang, $salt, $timezone);
+        $kimaiConfig = new Kimai_Config([
+            'server_prefix' => $prefix,
+            'server_hostname' => $hostname,
+            'server_database' => $database,
+            'server_username' => $username,
+            'server_password' => $password,
+            'server_charset' => $charset,
+            'defaultTimezone' => $timezone,
+            'password_salt' => $salt
+        ]);
+        Kimai_Registry::setConfig($kimaiConfig);
 
-    break;
-    
+        write_config_file($database, $hostname, $username, $password, $charset, $prefix, $lang, $salt, $timezone);
+
+        break;
+
     /**
      * Create the database.
      */
-    case ("make_database"):
+    case 'make_database':
         $databaseName = $_REQUEST['database'];
-        $hostname     = $_REQUEST['hostname'];
-        $username     = $_REQUEST['username'];
-        $password     = $_REQUEST['password'];
+        $hostname = $_REQUEST['hostname'];
+        $username = $_REQUEST['username'];
+        $password = $_REQUEST['password'];
 
         $db_error = false;
         $result = false;
+        $config = new Kimai_Config([]);
 
-        $database = new Kimai_Database_Mysql($result, false);
+        $database = new Kimai_Database_Mysql($config, false);
         $database->connect($hostname, null, $username, $password, true);
         $conn = $database->getConnectionHandler();
-        
+
         $query = "CREATE DATABASE `" . $databaseName . "` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
         $result = $conn->Query($query);
 
         if ($result !== false) {
-            echo "1"; // <-- hat geklappt
+            echo "1"; // ok
         } else {
-            echo "0"; // <-- schief gegangen
+            echo "0"; // error
         }
-
-    break;
-
+        break;
 }

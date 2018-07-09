@@ -1,46 +1,89 @@
 <?php
+/**
+ * This file is part of
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
+ * (c) Kimai-Development-Team since 2006
+ *
+ * Kimai is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; Version 3, 29 June 2007
+ *
+ * Kimai is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kimai; If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * Copyright (C) 2011 by Skaldrom Y. Sarg of oncode.info
- *  
+ *
  * This is free software. Use it however you want.
  */
+class Kimai_Auth_Ldap extends Kimai_Auth_Abstract
+{
 
-class Kimai_Auth_Ldap extends Kimai_Auth_Abstract {
-
-    /** Your LDAP-Server */
-    private $LADP_SERVER = 'ldap://localhost';
-    /** Case-insensitivity of some Servers may confuse the case-sensitive-accounting system. */
+    /**
+     * Your LDAP-Server
+     * @var string
+     */
+    private $LDAP_SERVER = 'ldap://localhost';
+    /**
+     * Case-insensitivity of some server may confuse the case-sensitive-accounting system
+     * @var bool
+     */
     private $LDAP_FORCE_USERNAME_LOWERCASE = true;
-    /** Preprends to username */
+    /**
+     * Prefix for username in LDAP query
+     * @var string
+     */
     private $LDAP_USERNAME_PREFIX = 'cn=';
-    /** Appends to username */
+    /**
+     * Postfix for username in LDAP query
+     * @var string
+     */
     private $LDAP_USERNAME_POSTFIX = ',dc=example,dc=com';
-    /** Accounts that sould be locally verified */
-    private $LDAP_LOCAL_ACCOUNTS = array('admin');
-    /** Automatically create a user in kimai if the login is successful. */
+    /**
+     * Accounts that should be verified locally only (in Kimai database)
+     * @var array
+     */
+    private $LDAP_LOCAL_ACCOUNTS = ['admin'];
+    /**
+     * Automatically create a user in kimai if the login is successful
+     * @var bool
+     */
     private $LDAP_USER_AUTOCREATE = true;
     /**
-     * @var Kimai_Auth_Kimai|null
+     * The original Kimai authenticator for local authentication and user creation.
+     * @var Kimai_Auth_Kimai
      */
     private $kimaiAuth = null;
 
-    public function __construct($database = null, $kga = null) {
+    /**
+     * {@inherit}
+     */
+    public function __construct($database = null, $kga = null)
+    {
+        if (!function_exists('ldap_bind')) {
+            throw new Kimai_Auth_Exception('LDAP-Extension is not installed');
+        }
         parent::__construct($database, $kga);
         $this->kimaiAuth = new Kimai_Auth_Kimai($database, $kga);
     }
 
-    public function authenticate($username, $password, &$userId) {
+    /**
+     * @param string $username
+     * @param string $password
+     * @param int $userId
+     * @return bool
+     */
+    public function authenticate($username, $password, &$userId)
+    {
         // Check if username should be authenticated locally
         if (in_array($username, $this->LDAP_LOCAL_ACCOUNTS)) {
             return $this->kimaiAuth->authenticate($username, $password, $userId);
-        }
-
-        // Check environment sanity
-        if (!function_exists('ldap_bind')) {
-            echo 'ldap is not installed!';
-            $userId = false;
-            return false;
         }
 
         // Check if username is legal
@@ -52,9 +95,9 @@ class Kimai_Auth_Ldap extends Kimai_Auth_Abstract {
         }
 
         // Connect to LDAP
-        $connect_result = ldap_connect($this->LADP_SERVER);
+        $connect_result = ldap_connect($this->LDAP_SERVER);
         if (!$connect_result) {
-            echo "Cannot connect to ", $this->LADP_SERVER;
+            echo "Cannot connect to ", $this->LDAP_SERVER;
             $userId = false;
             return false;
         }
@@ -78,15 +121,15 @@ class Kimai_Auth_Ldap extends Kimai_Auth_Abstract {
         if ($userId === false) {
             // User does not exist (yet)
             if ($this->LDAP_USER_AUTOCREATE) { // Create it!
-		$userId = $this->database->user_create(array(
-			'name' => $check_username,
-			'globalRoleID' => $this->getDefaultGlobalRole(),
-			'active' => 1
-		));
-                $this->database->setGroupMemberships($userId, array($this->getDefaultGroups()));
+                $userId = $this->database->user_create([
+                    'name' => $check_username,
+                    'globalRoleID' => $this->getDefaultGlobalRole(),
+                    'active' => 1
+                ]);
+                $this->database->setGroupMemberships($userId, $this->getDefaultGroups());
 
                 // Set a password, to calm kimai down
-                $usr_data = array('password' => md5($this->kga['password_salt'] . md5(uniqid(rand(), true)) . $this->kga['password_salt']));
+                $usr_data = ['password' => md5($this->kga['password_salt'] . md5(uniqid(rand(), true)) . $this->kga['password_salt'])];
                 $this->database->user_edit($userId, $usr_data);
             } else {
                 $userId = false;
@@ -96,8 +139,4 @@ class Kimai_Auth_Ldap extends Kimai_Auth_Abstract {
 
         return true;
     }
-
 }
-
-// There should be NO trailing whitespaces.
-?>

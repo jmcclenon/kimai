@@ -1,8 +1,8 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
- * (c) 2006-2009 Kimai-Development-Team
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
+ * (c) Kimai-Development-Team since 2006
  *
  * Kimai is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,32 +27,27 @@ if (!isset($_REQUEST['a'])) {
 }
 
 if (!isset($_REQUEST['name']) || is_array($_REQUEST['name'])) {
-    $name = ""; 
-} else { 
+    $name = '';
+} else {
     $name = $_REQUEST['name'];
 }
 
 if (!isset($_REQUEST['key']) || is_array($_REQUEST['key'])) {
-    $key = "nokey"; // will never match since hash values are either NULL or 32 characters
-} else { 
+    $key = 'nokey'; // will never match since hash values are either NULL or 32 characters
+} else {
     $key = $_REQUEST['key'];
 }
 
+require 'includes/basics.php';
 
-// standard includes
-require('includes/basics.php');
+$database = Kimai_Registry::getDatabase();
 
 $view = new Zend_View();
 $view->setBasePath(WEBROOT . '/templates');
 
-// authentication method
-$authClass = 'Kimai_Auth_' . ucfirst($kga['authenticator']);
-if (!class_exists($authClass)) {
-    $authClass = 'Kimai_Auth_' . ucfirst($kga['authenticator']);
-}
-$authPlugin = new $authClass($database, $kga);
+$authPlugin = Kimai_Registry::getAuthenticator();
 
-$view->kga = $kga;
+$view->assign('kga', $kga);
 
 // current database setup correct?
 checkDBversion(".");
@@ -61,30 +56,30 @@ checkDBversion(".");
 $name = htmlspecialchars(trim($name));
 $is_customer = $database->is_customer_name($name);
 if ($is_customer) {
-  $id = $database->customer_nameToID($name);
-  $customer = $database->customer_get_data($id);
-  $keyCorrect = $key === $customer['passwordResetHash'];
+    $id = $database->customer_nameToID($name);
+    $customer = $database->customer_get_data($id);
+    $keyCorrect = $key === $customer['passwordResetHash'];
 } else {
-  $id = $database->user_name2id($name);
-  $user = $database->user_get_data($id);
-  $keyCorrect = $key === $user['passwordResetHash'];
+    $id = $database->user_name2id($name);
+    $user = $database->user_get_data($id);
+    $keyCorrect = $key === $user['passwordResetHash'];
 }
 
 switch ($_REQUEST['a'])
 {
     case "request":
         Kimai_Logger::logfile("password reset: " . $name . ($is_customer ? " as customer" : " as user"));
-    break;
+        break;
 
     // Show password reset page
     default:
-      $view->devtimespan = '2006-' . date('y');
-      $view->keyCorrect = $keyCorrect;
-      $view->requestData = array(
-        'key' => $key,
-        'name' => $name
-      );
+        $view->assign('devtimespan', '2006-' . date('y'));
+        $view->assign('keyCorrect', $keyCorrect);
+        $view->assign('requestData', [
+            'key' => $key,
+            'name' => $name
+        ]);
 
-      echo $view->render('login/forgotPassword.php');
-    break;
+        echo $view->render('login/forgotPassword.php');
+        break;
 }

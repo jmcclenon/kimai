@@ -1,6 +1,6 @@
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) 2006-2009 Kimai-Development-Team
  *
  * Kimai is free software; you can redistribute it and/or modify
@@ -37,14 +37,13 @@ function expense_extension_applyHoverIntent() {
 	$('#expenses').find('tr').hoverIntent({
 		sensitivity: 1,
 		interval: 500,
-		over:
-			function() {
-				$('#expenses').find('tr').removeClass('hover');
-				$(this).addClass('hover');},
-		out:
-			function() {
-				$(this).removeClass('hover');
-			}
+		over: function() {
+			$('#expenses').find('tr').removeClass('hover');
+			$(this).addClass('hover');
+		},
+		out: function() {
+			$(this).removeClass('hover');
+		}
 	});
 }
 

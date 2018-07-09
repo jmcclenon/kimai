@@ -1,9 +1,8 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) Kimai-Development-Team since 2006
- * http://www.kimai.org
  *
  * Kimai is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +19,16 @@
 
 namespace KimaiTest;
 
-use PHPUnit_Framework_TestCase;
 use Kimai_User;
 
 /**
- * Class UserTest
- *
- * @package KimaiTest
+ * @coversDefaultClass Kimai_User
  */
-class UserTest extends PHPUnit_Framework_TestCase
+class UserTest extends TestCase
 {
-
-    public function testIsAdmin()
+    public function testName()
     {
-        $user = new Kimai_User(array('status' => Kimai_User::ADMIN));
-        $this->assertTrue($user->isAdmin());
+        $user = new Kimai_User(['name' => 'foo']);
+        $this->assertEquals('foo', $user->getName());
     }
-
 }

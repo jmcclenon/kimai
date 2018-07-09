@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) 2006-2009 Kimai-Development-Team
  *
  * Kimai is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
  * by Miguel Carmona
  * http://miguelcarmona.name
  */
-return array(
+return [
     "countryCode" => "es-ES",
     "preferences" => "Preferencias",
     "total" => "Total",
@@ -67,7 +67,6 @@ return array(
     "new_evt" => "agregar evento",
     "day_summary" => "Sumario de Tiempo",
     "plzChoose" => "seleccionar",
-    "noEntries" => "No hay entradas...",
     "recordAgain" => "Guardar este evento nuevamente",
     "comment" => "Comentario",
     "zlocation" => "Ubicación",
@@ -211,7 +210,6 @@ return array(
     "noFading" => "sin efecto de fundido",
     "user_list_hidden" => "ocultar lista de usuarios por defecto",
 
-    'show_sensible_data' => 'Mostrar también datos privados en la extensión "debug".',
     'show_update_warn' => 'No mostrar una advertencia antes de la actualización .',
     'check_at_startup' => 'Mostrar un mensaje en la página de inicio de sesión si hay una versión nueva.',
     'show_daySeperatorLines' => 'Dibujar una línea entre entradas de días distintos.',
@@ -222,7 +220,6 @@ return array(
     'currency_sign' => 'Símbolo de moneda.',
     'currency_first' => 'Mostrar el nombre de la moneda antes que el valor (p.e., &euro; 100,00)',
     'display_date_format' => 'Formato de hora para la duración (<a href="http://php.net/manual/en/function.strftime.php" target="_blank">notación de strftime()</a>)',
-    'display_currentDate_format' => 'Formato de hora para el campo bajo la duración (<a href="http://php.net/manual/en/function.strftime.php" target="_blank">notación de strftime()</a>)',
     'table_date_format' => 'Formato de fecha para tablas (<a href="http://php.net/manual/en/function.strftime.php" target="_blank">notación de strftime()</a>)',
     'round_time' => 'Redondear tiempo a ',
     'round_time_minute' => ' minuto(s).',
@@ -240,21 +237,25 @@ return array(
 
     'multiplier' => 'Multiplicador',
 
-    'months' => array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"),
-    'months_short' => array("Ene", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Ago", "Set", "Oct", "Nov", "Dic"),
-    'weekdays' => array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"),
-    'weekdays_short' => array("Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"),
+    'months' => ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"],
+    'months_short' => ["Ene", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Ago", "Set", "Oct", "Nov", "Dic"],
+    'weekdays' => ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+    'weekdays_short' => ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
 
-    'errors' => array(
-        0 => array('hdl' => "¡No se puede conectar con la base de datos!",
-            'txt' => "Please make sure your Database is running, has an active PDO connector and the entries in 'autoconf.php' in folder 'includes' are correct."),
-        1 => array('hdl' => "Error durante la instalación!",
+    'errors' => [
+        0 => [
+            'hdl' => "¡No se puede conectar con la base de datos!",
+            'txt' => "Please make sure your Database is running, has an active PDO connector and the entries in 'autoconf.php' in folder 'includes' are correct."
+        ],
+        1 => [
+            'hdl' => "Error durante la instalación!",
             'txt' => 'Kimai no puede crear las tablas necesarias porque existen tablas con el mismo nombre.<br/>
 Para actualizar su instalación existente, haga click <a href="../index.php">aquí</a>.<br/>
-Escoja otro prefijo de tabla o elimine las tablas existentes con este prefijo para permitir una instalación límpia de esta versión de Kimai.')
-    ),
+Escoja otro prefijo de tabla o elimine las tablas existentes con este prefijo para permitir una instalación límpia de esta versión de Kimai.'
+        ]
+    ],
 
-    'updater' => array(
+    'updater' => [
         0 => "Sí, tengo una copia de seguridad de la base de datos de mi instalación. ¡Proceder la actualización!",
         10 => "Leyenda:",
         20 => "Consulta ejecutada con éxito.",
@@ -269,10 +270,11 @@ Escoja otro prefijo de tabla o elimine las tablas existentes con este prefijo pa
         110 => "Nuevas contraseñas",
         120 => "Véase más abajo las nuevas contraseñas para cada usuario.",
         130 => "No se puede escribir en autoconf.php.",
-        140 => "Archivo autoconf.php actualizado"),
+        140 => "Archivo autoconf.php actualizado"
+    ],
 
 
-    'backup' => array(
+    'backup' => [
         0 => "¡Esta utilidad de restauración de copia de seguridad no está testeada! ¡Utilícela bajo su propio riesgo!",
         1 => "Copias de seguridad disponibles:",
         2 => "restaurar",
@@ -282,9 +284,10 @@ Escoja otro prefijo de tabla o elimine las tablas existentes con este prefijo pa
         6 => "Copia de seguridad de",
         7 => "fue restaurada.",
         8 => "crear copia de seguridad",
-        9 => "¡Estas copias de seguridad en realidad son instantáneas! Lo que significa que aún \"viven\" en la misma base de datos como los datos reales de su trabajo en Kimai. Las copias de seguridad a través de esta utilidad no son la sustitución de las copias de seguridad reales en un medio físico de datos diferentes. Hay un montón de herramientas para copias de seguridad de bases de datos disponibles en la web. ;)"),
+        9 => "¡Estas copias de seguridad en realidad son instantáneas! Lo que significa que aún \"viven\" en la misma base de datos como los datos reales de su trabajo en Kimai. Las copias de seguridad a través de esta utilidad no son la sustitución de las copias de seguridad reales en un medio físico de datos diferentes. Hay un montón de herramientas para copias de seguridad de bases de datos disponibles en la web. ;)"
+    ],
 
-    'export_extension' => array(
+    'export_extension' => [
 
         "print_hint" => "Acepte para abrir una tabla imprimible.",
         "dl_hint" => "Acepte para descargar un archivo exportable.",
@@ -338,9 +341,9 @@ Escoja otro prefijo de tabla o elimine las tablas existentes con este prefijo pa
         'time_period' => 'periodo temporal',
 
         'duration_unit' => 'h',
-    ),
+    ],
 
-    'ext_invoice' => array(
+    'ext_invoice' => [
         "invoiceTitle" => "Crear factura",
         "invoiceProject" => "Proyectos",
         "invoiceTimePeriod" => "Periodo de tiempo",
@@ -348,14 +351,14 @@ Escoja otro prefijo de tabla o elimine las tablas existentes con este prefijo pa
         "invoiceOptionRound" => "Redondear tiempo",
         "invoiceButton" => "Crear",
         'noData' => 'No hay entradas para el proyecto y periodo seleccionados.'
-    ),
+    ],
 
-    'extensions' => array(
+    'extensions' => [
         'ki_timesheet' => 'Hoja de registro',
         'ki_budget' => 'Presupuesto',
         'ki_expenses' => 'Gastos',
         'ki_invoice' => 'Facturas',
         'ki_export' => 'Exportar',
         'ki_adminpanel' => 'Administración'
-    )
-);
+    ]
+];

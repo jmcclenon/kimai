@@ -1,4 +1,4 @@
 <?php
-$kga['version'] = '0.9.3';
-$kga['revision'] = 1386; // database revision number (incremented whenever the database changes)
-$kga['status'] = 'dev'; // leave blank if stable
+$kga['version'] = '1.3.1';
+$kga['revision'] = 1394; // database revision number (incremented whenever the database changes)
+$kga['status'] = ''; // leave blank if stable

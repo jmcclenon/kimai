@@ -1,24 +1,43 @@
 <?php
+/**
+ * This file is part of
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
+ * (c) Kimai-Development-Team since 2006
+ *
+ * Kimai is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; Version 3, 29 June 2007
+ *
+ * Kimai is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kimai; If not, see <http://www.gnu.org/licenses/>.
+ */
 
+/**
+ * Class Kimai_Extensions
+ */
 class Kimai_Extensions
 {
-
-    private $ext_configs = array();
-    private $php_include_files = array();
-    private $css_extension_files = array();
-    private $js_extension_files = array();
-    private $extensions = array();
-    private $tab_change_trigger = array();
-    private $timeframe_changed_hooks = array();
-    private $record_hooks = array();
-    private $buzzer_stop_hooks = array();
-    private $users_changed_hooks = array();
-    private $customers_changed_hooks = array();
-    private $projects_changed_hooks = array();
-    private $activities_changed_hooks = array();
-    private $filter_hooks = array(); // list filter hooks
-    private $resize_hooks = array(); // resize hooks
-    private $timeouts = array();
+    private $ext_configs = [];
+    private $php_include_files = [];
+    private $css_extension_files = [];
+    private $js_extension_files = [];
+    private $extensions = [];
+    private $tab_change_trigger = [];
+    private $timeframe_changed_hooks = [];
+    private $record_hooks = [];
+    private $buzzer_stop_hooks = [];
+    private $users_changed_hooks = [];
+    private $customers_changed_hooks = [];
+    private $projects_changed_hooks = [];
+    private $activities_changed_hooks = [];
+    private $filter_hooks = []; // list filter hooks
+    private $resize_hooks = []; // resize hooks
+    private $timeouts = [];
     private $extensionsDir;
     private $kga;
 
@@ -33,7 +52,7 @@ class Kimai_Extensions
      */
     public function loadConfigurations()
     {
-        global $database;
+        $database = Kimai_Registry::getDatabase();
         $handle = opendir($this->extensionsDir);
 
         if (!$handle) {
@@ -41,7 +60,6 @@ class Kimai_Extensions
         }
 
         while (false !== ($dir = readdir($handle))) {
-
             if (is_file($dir) || $dir == "." || $dir == ".." || substr($dir, 0) == "." || substr($dir, 0, 1) == "#") {
                 continue;
             }
@@ -61,16 +79,19 @@ class Kimai_Extensions
 
             // Check if user has the correct rank to use this extension
             if (isset($this->kga['user'])) {
-                if (!$database->global_role_allows($this->kga['user']['globalRoleID'], $settings['EXTENSION_KEY'] . '-access'))
+                if (!$database->global_role_allows($this->kga['user']['globalRoleID'], $settings['EXTENSION_KEY'] . '-access')) {
                     continue;
-            } else if ($settings['CUSTOMER_ALLOWED'] != "1") {
+                }
+            } elseif ($settings['CUSTOMER_ALLOWED'] != "1") {
                 continue;
             }
 
-            $this->extensions[] = array('name' => $settings['EXTENSION_NAME'],
+            $this->extensions[] = [
+                'name' => $settings['EXTENSION_NAME'],
                 'key' => $settings['EXTENSION_KEY'],
                 'initFile' => $settings['EXTENSION_INIT_FILE'],
-                'tabChangeTrigger' => isset($settings['TAB_CHANGE_TRIGGER']) ? $settings['TAB_CHANGE_TRIGGER'] : "");
+                'tabChangeTrigger' => isset($settings['TAB_CHANGE_TRIGGER']) ? $settings['TAB_CHANGE_TRIGGER'] : ""
+            ];
 
             $this->addOptionalValue($settings, 'CSS_INCLUDE_FILES', $this->css_extension_files);
 
@@ -106,19 +127,22 @@ class Kimai_Extensions
     {
         if (is_array($value)) {
             foreach ($value as $subvalue) {
-                if (!in_array($subvalue, $list))
+                if (!in_array($subvalue, $list)) {
                     $list[] = $subvalue;
+                }
             }
         } else {
-            if (!in_array($value, $list))
+            if (!in_array($value, $list)) {
                 $list[] = $value;
+            }
         }
     }
 
     private function addOptionalValue(&$settings, $key, &$list)
     {
-        if (isset($settings[$key]))
+        if (isset($settings[$key])) {
             $this->addValue($settings[$key], $list);
+        }
     }
 
     public function extensionsTabData()
@@ -194,5 +218,4 @@ class Kimai_Extensions
         }
         return $timeoutlist;
     }
-
 }

@@ -1,4 +1,21 @@
 <?php
+/**
+ * This file is part of
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
+ * (c) Kimai-Development-Team since 2006
+ *
+ * Kimai is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; Version 3, 29 June 2007
+ *
+ * Kimai is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kimai; If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * Copyright (C) 2011 by Skaldrom Y. Sarg of oncode.info
@@ -18,7 +35,6 @@
  * @author Andreas Heigl<andras@heigl.org>
  * @since  15.08.2014
  */
-
 class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
 {
 
@@ -52,7 +68,7 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
      *
      * @var string $searchBase
      */
-    protected  $searchBase = 'dc=example,c=org';
+    protected $searchBase = 'dc=example,c=org';
 
     /**
      * The filter to use when searching for a user
@@ -110,9 +126,9 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
      *
      * @var array $allowedGroupIds
      */
-    protected $allowedGroupIds = array(
+    protected $allowedGroupIds = [
         'kimai-access',
-    );
+    ];
 
     /**
      * Shall we force usernames to lowercase?
@@ -122,18 +138,18 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
     protected $forceLowercase = true;
 
     /**
-     * Accounts that sould be verified locally.
+     * Accounts that should be verified locally.
      *
      * All entries in this array will not be checked against the LDAP
      *
      * @var array $nonLdapAccounts
      */
-    protected $nonLdapAcounts = array(
+    protected $nonLdapAcounts = [
         'admin'
-    );
+    ];
 
     /**
-     * Automatically create a user in kimai if the login is successful.
+     * Automatically create a user in Kimai if the login is successful.
      *
      * @var boolean $autocreateUsers
      */
@@ -147,13 +163,19 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
     protected $defaultGlobalRoleName = 'User';
 
     /**
+     *
+     * @var boolean $createGroupMembershipsOnLogin
+     */
+    protected $createGroupMembershipsOnLogin = false;
+
+    /**
      * Map of group=>role names for new users
      *
      * @var array $defaultGroupMemberships
      */
-    protected $defaultGroupMemberships = array(
+    protected $defaultGroupMemberships = [
         'Users' => 'User',
-    );
+    ];
 
     /**
      * @var Kimai_Auth_Kimai $kimaiAuth
@@ -166,7 +188,7 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
     public function __construct($database = null, $kga = null)
     {
         if (!function_exists('ldap_bind')) {
-            throw new InvalidArgumentException('LDAP-Extension is not installed');
+            throw new Kimai_Auth_Exception('LDAP-Extension is not installed');
         }
         parent::__construct($database, $kga);
         $this->kimaiAuth = new Kimai_Auth_Kimai($database, $kga);
@@ -199,6 +221,9 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
 
         ldap_set_option($connect_result, LDAP_OPT_PROTOCOL_VERSION, 3);
 
+        // Disable referral support for enhanced Active Directory compatibility
+        ldap_set_option($connect_result, LDAP_OPT_REFERRALS, 0);
+
         // Bind to the ldap and query for the given userinformation.
         if ($this->bindDN && $this->bindPW) {
             $bindResult = ldap_bind($connect_result, $this->bindDN, $this->bindPW);
@@ -221,11 +246,11 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
             $connect_result,
             $this->searchBase,
             $filter,
-            array(
+            [
                 $this->usernameAttribute,
                 $this->mailAttribute,
                 $this->commonNameAttribute,
-            ),
+            ],
             0,
             0,
             10
@@ -261,14 +286,14 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
         // bother the server any more.
         ldap_free_result($_ldapresults);
         $distinguishedName = $_results[0]['dn'];
-        $uidAttribute      = $_results[0][$this->usernameAttribute][0];
+        $uidAttribute      = $_results[0][strtolower($this->usernameAttribute)][0];
         $emailAddress      = '';
         $commonName        = '';
-        if (isset($_results[0][$this->mailAttribute][0])) {
-            $emailAddress = $_results[0][$this->mailAttribute][0];
+        if (isset($_results[0][strtolower($this->mailAttribute)][0])) {
+            $emailAddress = $_results[0][strtolower($this->mailAttribute)][0];
         }
-        if (isset($_results[0][$this->commonNameAttribute][0])) {
-            $commonName = $_results[0][$this->commonNameAttribute][0];
+        if (isset($_results[0][strtolower($this->commonNameAttribute)][0])) {
+            $commonName = $_results[0][strtolower($this->commonNameAttribute)][0];
         }
 
         // Now lets try to bind with the returned distinguishedName and the
@@ -286,7 +311,7 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
             $connect_result,
             $this->searchBase,
             $filter,
-            array($this->groupidAttribute),
+            [$this->groupidAttribute],
             0,
             0,
             10
@@ -312,11 +337,11 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
         }
         ldap_free_result($_ldapresults);
 
-        $groups = array();
+        $groups = [];
         foreach ($_results as $result) {
-            $resultGroups = array();
-            for ($i = 0; $i < $result[$this->groupidAttribute]['count']; $i++) {
-                $resultGroups[] = $result[$this->groupidAttribute][$i];
+            $resultGroups = [];
+            for ($i = 0; $i < $result[strtolower($this->groupidAttribute)]['count']; $i++) {
+                $resultGroups[] = $result[strtolower($this->groupidAttribute)][$i];
             }
             $groups = array_merge($groups, $resultGroups);
         }
@@ -329,23 +354,23 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
         }
 
         // User is authenticated. Does it exist in Kimai yet?
-        $check_username = $this->forceLowercase ? strtolower($uidAttribute) : $uidAttribute;
+        $check_username = $this->createCheckUsername($username, $uidAttribute);
 
         $userId = $this->database->user_name2id($check_username);
         if ($userId === false) {
             // User does not exist (yet)
             if ($this->autocreateUsers) {
                 // Create it!
-                $userId = $this->database->user_create(array(
+                $userId = $this->database->user_create([
                     'name'         => $check_username,
                     'globalRoleID' => $this->getDefaultGlobalRole(),
                     'active'       => 1
-                ));
+                ]);
 
                 $this->database->setGroupMemberships($userId, $this->getDefaultGroups());
 
                 // Set a password, to calm kimai down
-                $usr_data = array('password' => md5($this->kga['password_salt'] . md5(uniqid(rand(), true)) . $this->kga['password_salt']));
+                $usr_data = ['password' => md5($this->kga['password_salt'] . md5(uniqid(rand(), true)) . $this->kga['password_salt'])];
                 if ($emailAddress) {
                     $usr_data['mail'] = $emailAddress;
                 }
@@ -357,6 +382,13 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
                 $userId = false;
                 return false;
             }
+        } else {
+            // User exists
+            if ($this->createGroupMembershipsOnLogin === true) {
+                // create the groups as defined in $defaultGroupMemberships
+                // this will not affect a user's existing groups or roles in those existing groups
+                $this->database->setGroupMemberships($userId, $this->getDefaultGroups(), false);
+            }
         }
 
         return true;
@@ -365,7 +397,7 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
     /**
      * Get the default global role
      *
-     * @return integer
+     * @return int
      */
     public function getDefaultGlobalRole()
     {
@@ -391,9 +423,9 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
      */
     public function getDefaultGroups()
     {
-        $groups = array();
-        $roles  = array();
-        $map    = array();
+        $groups = [];
+        $roles  = [];
+        $map    = [];
 
         $database = $this->getDatabase();
         foreach ($database->membership_roles() as $role) {
@@ -416,5 +448,15 @@ class Kimai_Auth_Ldapadvanced extends Kimai_Auth_Abstract
         }
 
         return $map;
+    }
+
+    /**
+     * @param $username
+     * @param $uidAttribute
+     * @return string
+     */
+    protected function createCheckUsername($username, $uidAttribute)
+    {
+        return $this->forceLowercase ? strtolower($uidAttribute) : $uidAttribute;
     }
 }

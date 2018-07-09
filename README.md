@@ -1,44 +1,67 @@
+[![Latest Stable Version](https://poser.pugx.org/kimai/kimai/v/stable)](https://packagist.org/packages/kimai/kimai)
+[![Total Downloads](https://poser.pugx.org/kimai/kimai/downloads)](https://packagist.org/packages/kimai/kimai)
 [![Build status](https://travis-ci.org/kimai/kimai.svg?branch=master)](https://travis-ci.org/kimai/kimai "Current build status")
  [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/kimai/kimai.svg)](http://isitmaintained.com/project/kimai/kimai "Average time to resolve an issue")
  [![Percentage of issues still open](http://isitmaintained.com/badge/open/kimai/kimai.svg)](http://isitmaintained.com/project/kimai/kimai "Percentage of issues still open")
+ [![Join the chat at https://gitter.im/kimai/kimai](https://badges.gitter.im/kimai/kimai.svg)](https://gitter.im/kimai/kimai)
 
 Kimai Time Tracking
 ===================
+
+![Kimai](https://raw.githubusercontent.com/kimai/documentation/master/assets/intro.jpg)
 
 This is the repository of Kimai, a open source time tracking software
 that runs on (almost) every webserver with PHP and MySQL.
 
 You can get more information about this time-tracking software:
 
-* at our [website](http://www.kimai.org)
-* at our [forum](http://forum.kimai.org)
-* in the [documentation](http://www.kimai.org/documentation/)
+* at our [website](https://www.kimai.org)
+* in the [documentation](https://www.kimai.org/documentation/)
+
+## Announcement Kimai v2 (June 2018)
+
+We are thrilled to announce  that we are working on the **next major version of Kimai**.
+
+Go ahead and [read our blog posting](https://www.kimai.org/blog/2018/kimai-v2-announcement/) to find out more.
+
+## Features
+
+This is just a short feature list, play around with the [demo installation](https://www.kimai.org/demo/) to see all features:
+
+* Multi-user management
+* Customer login with read only privileges
+* Every user has its own timesheet
+* Extensive and role-based permission management
+* Manage customers, projects and activities
+* Track project budgets
+* Record expenses
+* Print invoices in multiple formats (ODT, ODS, HTML)
+* Export data in multiple formats (PDF, XLSX, CSV, direct print)
+* SOAP and JSON API
+* LDAP login provider
+* Native apps ... see our [Apps page](https://www.kimai.org/apps/)
+
+## Missing features
+
+* Different rates for different working hours. Rates can only be set for users, projects and activities
+* Budgets based on time
+* No workflow ([approval process](https://github.com/kimai/kimai/issues/470))
+
+![Screenshot](https://www.kimai.org/assets/kimai08.jpg)
+
+## Getting Started
+
+Kimai requires a webserver with PHP and a database (MySQL recommended).
+
+Please see the [online documentation](https://www.kimai.org/documentation/installation/) in order to set up Kimai on your webserver.
 
 ## Contributing
 
-We would love to get input from all developer out there:
+We would love to get input from all developers out there.
+Please read our [contribution guidelines](https://github.com/kimai/kimai/blob/master/.github/CONTRIBUTING.md) to find out how.
 
-1. Fork Kimai or one of its [other repos][1]
-2. Clone repository to your local disc
-3. Create a branch (`git checkout -b my_kimai`)
-4. Commit your changes to your fork. In your commit message refer to the issue number if there is already one, e.g. (`git commit -am "[BUGFIX] short description of fix (resolves #4711)"`)
-5. Push to the branch (`git push origin my_kimai`)
-6. Submit a [Pull Request][2] using GitHub with a link to your branch (here are some hints on [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request))
+## Support / Donate
 
-## Keep your fork in sync with original repository
+If you have a feature request that you want to be implemented or a bug that you want to have fixed, you can go to [bountysource](https://www.bountysource.com/teams/kimai/issues) and donate for a specific issue by posting a bounty. The developer who then implements this feature will get the money as soon as the feature gets merged.
 
-1. git remote add upstream https://github.com/kimai/kimai.git
-2. git fetch upstream
-3. git checkout master
-4. git merge upstream/master
-5. git push origin master
-
-Here are a few rules to follow in order to ease code reviews, and discussions before maintainers accept and merge your work:
-
-* You SHOULD write documentation.
-* Please, write commit messages that make sense, and rebase your branch before submitting your Pull Request.
-* One may ask you to squash your commits too. This is used to "clean" your Pull Request before merging it (we don't want commits such as fix tests, fix 2, fix 3, etc.).
-* When creating your Pull Request on GitHub, you MUST write a description which gives the context and/or explains why you are creating it.
-
-[1]: https://github.com/kimai
-[2]: https://github.com/kimai/kimai/pulls
+Direct Support via PayPal is also possible. Just make a comment in the issue that you want to sponsor and we will get in touch.

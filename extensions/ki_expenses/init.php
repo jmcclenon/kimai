@@ -1,8 +1,8 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
- * (c) 2006-2009 Kimai-Development-Team
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
+ * (c) Kimai-Development-Team since 2006
  *
  * Kimai is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ include('../../includes/basics.php');
 include('private_db_layer_mysql.php');
 checkUser();
 
-$dir_templates = "templates/";
+$dir_templates = 'templates/';
 $datasrc = "config.ini";
 $settings = parse_ini_file($datasrc);
 $dir_ext = $settings['EXTENSION_DIR'];
@@ -37,10 +37,10 @@ $in = $timeframe[0];
 $out = $timeframe[1];
 
 $view = new Zend_View();
-$view->setBasePath(WEBROOT . 'extensions/' . $dir_ext . '/' . $dir_templates);
+$view->setBasePath(WEBROOT . '/extensions/' . $dir_ext . '/' . $dir_templates);
 $view->addHelperPath(WEBROOT . '/templates/helpers', 'Zend_View_Helper');
 
-$view->kga = $kga;
+$view->assign('kga', $kga);
 
 // prevent IE from caching the response
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -48,43 +48,47 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+if (isset($kga['user'])) {
+    // user logged in
+    $view->assign('expenses', get_expenses($in, $out, [$kga['user']['userID']], null, null, 1));
+} else {
+    // customer logged in
+    $view->assign('expenses', get_expenses($in, $out, null, [$kga['customer']['customerID']], null, 1));
+}
+
+$view->assign('total', Kimai_Format::formatCurrency(array_reduce($view->expenses, function ($sum, $expense) {
+    return $sum + $expense['multiplier'] * $expense['value'];
+}, 0)));
+
+
 if (isset($kga['user'])) // user logged in
-$view->expenses = get_expenses($in, $out, array($kga['user']['userID']), null, null, 1);
+  $ann = expenses_by_user($in, $out, [$kga['user']['userID']]);
 else // customer logged in
-$view->expenses = get_expenses($in, $out, null, array($kga['customer']['customerID']), null, 1);
-
-$view->total = Kimai_Format::formatCurrency(array_reduce($view->expenses, function($sum, $expense) { return $sum + $expense['multiplier'] * $expense['value']; }, 0));
-
-
-if (isset($kga['user'])) // user logged in
-  $ann = expenses_by_user($in, $out, array($kga['user']['userID']));
-else // customer logged in
-  $ann = expenses_by_user($in, $out, null, array($kga['customer']['customerID']));
+  $ann = expenses_by_user($in, $out, null, [$kga['customer']['customerID']]);
 $ann = Kimai_Format::formatCurrency($ann);
-$view->user_annotations = $ann;
+$view->assign('user_annotations', $ann);
 
 // TODO: function for loops or convert it in template with new function
 if (isset($kga['user'])) // user logged in
-  $ann = expenses_by_customer($in, $out, array($kga['user']['userID']));
+  $ann = expenses_by_customer($in, $out, [$kga['user']['userID']]);
 else // customer logged in
-  $ann = expenses_by_customer($in, $out, null, array($kga['customer']['customerID']));
+  $ann = expenses_by_customer($in, $out, null, [$kga['customer']['customerID']]);
 $ann = Kimai_Format::formatCurrency($ann);
-$view->customer_annotations = $ann;
+$view->assign('customer_annotations', $ann);
 
 if (isset($kga['user'])) // user logged in
-  $ann = expenses_by_project($in, $out, array($kga['user']['userID']));
+  $ann = expenses_by_project($in, $out, [$kga['user']['userID']]);
 else // customer logged in
-  $ann = expenses_by_project($in, $out, null, array($kga['customer']['customerID']));
+  $ann = expenses_by_project($in, $out, null, [$kga['customer']['customerID']]);
 $ann = Kimai_Format::formatCurrency($ann);
-$view->project_annotations = $ann;
+$view->assign('project_annotations', $ann);
 
-if (isset($kga['user']))
-  $view->hideComments = $database->user_get_preference('ui.showCommentsByDefault') != 1;
-else
-  $view->hideComments = true;
+if (isset($kga['user'])) {
+    $view->assign('hideComments', !$kga->getSettings()->isShowComments());
+} else {
+    $view->assign('hideComments', true);
+}
 
-$view->expenses_display = $view->render("expenses.php");
+$view->assign('expenses_display', $view->render("expenses.php"));
 
 echo $view->render('main.php');
-
-?>

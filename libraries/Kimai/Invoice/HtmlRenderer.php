@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of
- * Kimai - Open Source Time Tracking // http://www.kimai.org
+ * Kimai - Open Source Time Tracking // https://www.kimai.org
  * (c) Kimai-Development-Team
  *
  * Kimai is free software; you can redistribute it and/or modify
@@ -24,7 +24,6 @@
  */
 class Kimai_Invoice_HtmlRenderer extends Kimai_Invoice_AbstractRenderer
 {
-
     const FILE_PHTML = 'index.phtml';
     const FILE_HTML = 'index.html';
 
@@ -48,7 +47,9 @@ class Kimai_Invoice_HtmlRenderer extends Kimai_Invoice_AbstractRenderer
 
         // DO NOT RELY ON THESE VARIABLES - they are only here for compatibility with the ODT layer
         $view->assign('CustomerODT', $this->prepareCustomerArray($this->getModel()->getCustomer()));
-        $view->assign('project', implode(', ', array_map(function($project) { return $project['name']; }, $this->getModel()->getProjects())));
+        $view->assign('project', implode(', ', array_map(function ($project) {
+            return $project['name'];
+        }, $this->getModel()->getProjects())));
 
         $data = $this->getModel()->toArray();
         foreach ($data as $key => $value) {
@@ -88,5 +89,4 @@ class Kimai_Invoice_HtmlRenderer extends Kimai_Invoice_AbstractRenderer
             is_file($this->getTemplateDir() . $this->getTemplateFile() . DIRECTORY_SEPARATOR . self::FILE_PHTML)
         );
     }
-
 }

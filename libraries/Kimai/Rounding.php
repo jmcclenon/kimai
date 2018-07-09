@@ -13,9 +13,9 @@ class Kimai_Rounding
      * e.g.: 16:07:31 - 17:15:16 is "rounded" to 16:00:00 - 17:15:00
      *       with steps set to 15
      *
-     * @param $start the beginning of the timespan
-     * @param $end   the end of the timespan
-     * @param $steps the steps in minutes (has to divide an hour, e.g. 5 is valid while 7 is not)
+     * @param int $start the beginning of the timespan
+     * @param int $end   the end of the timespan
+     * @param int $steps the steps in minutes (has to divide an hour, e.g. 5 is valid while 7 is not)
      * @param $allowRoundDown
      * @return array
      */
@@ -25,9 +25,10 @@ class Kimai_Rounding
         $stepWidth = $steps * 60;
 
         if ($steps == 0) {
-            $bestTime = array();
+            $bestTime = [];
             $bestTime['start'] = $start;
             $bestTime['end'] = $end;
+            $bestTime['duration'] = $end - $start;
             return $bestTime;
         }
 
@@ -43,7 +44,7 @@ class Kimai_Rounding
 
 
         // assuming the earlier start end end time are the best (likely not always true)
-        $bestTime = array();
+        $bestTime = [];
         $bestTime['start'] = $earlierStart;
         $bestTime['end'] = $earlierEnd;
         $bestTime['duration'] = $earlierEnd - $earlierStart;
@@ -62,10 +63,10 @@ class Kimai_Rounding
      *
      * @param $bestTime (called by reference)
      *                  Array containing the, until now, best time data
-     * @param $newStart suggestion for a better start time
-     * @param $newEnd   suggestion for a better end time
-     * @param $realStart the real start time
-     * @param $realEnd   the real end time
+     * @param int $newStart suggestion for a better start time
+     * @param int $newEnd   suggestion for a better end time
+     * @param int $realStart the real start time
+     * @param int $realEnd   the real end time
      * @param $allowRoundDown
      */
     private static function roundTimespanCheckIfBetter(&$bestTime, $newStart, $newEnd, $realStart, $realEnd, $allowRoundDown)
